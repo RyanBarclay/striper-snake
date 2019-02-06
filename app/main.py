@@ -33,6 +33,9 @@ def ping():
 @bottle.post('/start')
 def start():
     data = bottle.request.json
+    game_id = data.get('game_id')
+    board_width = data.get('width')
+    board_height = data.get('height')
 
     """
     TODO: If you intend to have a stateful snake AI,
@@ -41,7 +44,11 @@ def start():
     """
     print(json.dumps(data))
 
-    color = "#00FF00"
+    color = "#D0D0D0"
+
+    print game_id
+    print board_width
+    print board_height
 
     return start_response(color)
 
@@ -49,6 +56,10 @@ def start():
 @bottle.post('/move')
 def move():
     data = bottle.request.json
+
+    # import data
+
+
 
     """
     TODO: Using the data from the endpoint request object, your
@@ -59,6 +70,7 @@ def move():
     directions = ['up', 'down', 'left', 'right']
     direction = random.choice(directions)
 
+    print direction
     return move_response(direction)
 
 
