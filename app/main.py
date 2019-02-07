@@ -4,6 +4,7 @@ import random
 import bottle
 
 from api import ping_response, start_response, move_response, end_response
+from brain import think
 
 @bottle.route('/')
 def index():
@@ -33,22 +34,14 @@ def ping():
 @bottle.post('/start')
 def start():
     data = bottle.request.json
-    game_id = data.get('game_id')
-    board_width = data.get('width')
-    board_height = data.get('height')
-
     """
     TODO: If you intend to have a stateful snake AI,
             initialize your snake state here using the
             request's data if necessary.
     """
-    print(json.dumps(data))
+    # print(json.dumps(data))
 
     color = "#D0D0D0"
-
-    print game_id
-    print board_width
-    print board_height
 
     return start_response(color)
 
@@ -56,21 +49,10 @@ def start():
 @bottle.post('/move')
 def move():
     data = bottle.request.json
-
-    # import data
-
-
-
-    """
-    TODO: Using the data from the endpoint request object, your
-            snake AI must choose a direction to move in.
-    """
-    print(json.dumps(data))
-
-    directions = ['up', 'down', 'left', 'right']
-    direction = random.choice(directions)
-
-    print direction
+    # print(json.dumps(data))
+    # directions = ['up', 'down', 'left', 'right']
+    direction = think(data)
+    # print direction
     return move_response(direction)
 
 
@@ -82,7 +64,7 @@ def end():
     TODO: If your snake AI was stateful,
         clean up any stateful objects here.
     """
-    print(json.dumps(data))
+    # print(json.dumps(data))
 
     return end_response()
 
