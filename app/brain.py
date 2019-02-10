@@ -144,10 +144,10 @@ def move_check(safe_choices, head_pos_x, head_pos_y, board_matrix):
 
     temp_token = board_matrix[0]
 
-    top_edge = len(board_matrix)-1
+    top_edge = 0
     right_edge = len(temp_token)-1
     left_edge = 0
-    bottom_edge = 0
+    bottom_edge = len(board_matrix)-1
 
     up_clear = True
     down_clear = True
@@ -161,7 +161,7 @@ def move_check(safe_choices, head_pos_x, head_pos_y, board_matrix):
     if head_pos_y == top_edge:
         up_clear = False
     else:
-        up_element = board_matrix[head_pos_y+1][head_pos_x]
+        up_element = board_matrix[head_pos_y-1][head_pos_x]
         if up_element in danger_elements:
             up_clear = False
 
@@ -169,7 +169,7 @@ def move_check(safe_choices, head_pos_x, head_pos_y, board_matrix):
     if head_pos_y == bottom_edge:
         down_clear = False
     else:
-        down_element = board_matrix[head_pos_y-1][head_pos_x]
+        down_element = board_matrix[head_pos_y+1][head_pos_x]
         if down_element in danger_elements:
             down_clear = False
 
@@ -208,6 +208,8 @@ def hunting(safe_choices, board_food,head_pos_x,head_pos_y):
     food_location = food_finder(board_food,head_pos_x,head_pos_y)
     food_x = food_location[0]
     food_y = food_location[1]
+    if debug:
+        print np.matrix(safe_choices)
 
     if head_pos_x != food_x:
         if (head_pos_x > food_x):
@@ -217,15 +219,16 @@ def hunting(safe_choices, board_food,head_pos_x,head_pos_y):
             else:
                 #check y alignment and see if thats a move otherwise do first
                 #element in safe_choices
+                #this is when it right above food
                 if head_pos_y > food_y:
-                    #if head > food_y, go down check
-                    if 'down' in safe_choices:
-                        return 'down'
+                    #if head > food_y, go up check
+                    if 'up' in safe_choices:
+                        return 'up'
                     else:
                         return safe_choices[0]
                 else:
-                    #if head < food_y, go up check
-                    if 'up' in safe_choices:
+                    #if head < food_y, go down check
+                    if 'down' in safe_choices:
                         return 'down'
                     else:
                         return safe_choices[0]
@@ -236,29 +239,30 @@ def hunting(safe_choices, board_food,head_pos_x,head_pos_y):
             else:
                 #check y alignment and see if thats a move otherwise do first
                 #element in safe_choices
+                #this is when it right above food
                 if head_pos_y > food_y:
-                    #if head > food_y, go down check
-                    if 'down' in safe_choices:
-                        return 'down'
+                    #if head > food_y, go up check
+                    if 'up' in safe_choices:
+                        return 'up'
                     else:
                         return safe_choices[0]
                 else:
-                    #if head < food_y, go up check
-                    if 'up' in safe_choices:
+                    #if head < food_y, go down check
+                    if 'down' in safe_choices:
                         return 'down'
                     else:
                         return safe_choices[0]
     else:
         #this is when it right above food
         if head_pos_y > food_y:
-            #if head > food_y, go down check
-            if 'down' in safe_choices:
-                return 'down'
+            #if head > food_y, go up check
+            if 'up' in safe_choices:
+                return 'up'
             else:
                 return safe_choices[0]
         else:
-            #if head < food_y, go up check
-            if 'up' in safe_choices:
+            #if head < food_y, go down check
+            if 'down' in safe_choices:
                 return 'down'
             else:
                 return safe_choices[0]
@@ -283,7 +287,7 @@ def food_finder(board_food,head_pos_x,head_pos_y):
         y_delta = food_y - head_pos_y
         y_delta = abs(y_delta)
         current_distance = y_delta + x_delta
-        print "current_distance: %d, closest_distance: %d" %(current_distance, closest_distance)
+        #print "current_distance: %d, closest_distance: %d" %(current_distance, closest_distance)
         if food_amount == len(board_food):
             #first time in loop
             closest_distance = current_distance
@@ -291,7 +295,6 @@ def food_finder(board_food,head_pos_x,head_pos_y):
         if current_distance <= closest_distance:
             closest_food = [food_x,food_y]
             closest_distance = current_distance
-            print "here"
 
         food_amount -= 1
 
