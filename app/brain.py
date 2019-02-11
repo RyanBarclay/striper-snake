@@ -206,8 +206,12 @@ def move_check(safe_choices, head_pos_x, head_pos_y, board_matrix):
 
 def hunting(safe_choices, board_food,head_pos_x,head_pos_y):
     food_location = food_finder(board_food,head_pos_x,head_pos_y)
-    food_x = food_location[0]
-    food_y = food_location[1]
+    if len(food_location) == 0:
+        food_x = 0
+        food_y=0
+    else:
+        food_x = food_location[0]
+        food_y = food_location[1]
     if debug:
         print np.matrix(safe_choices)
 
@@ -277,6 +281,9 @@ def food_finder(board_food,head_pos_x,head_pos_y):
     current_distance = 0
     x_delta = 0
     y_delta = 0
+
+    if food_amount == 0:
+        return closest_food
 
     while food_amount > 0:
         food_token = board_food[food_amount-1]
