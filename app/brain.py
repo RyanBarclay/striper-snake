@@ -1,8 +1,8 @@
 import math
 import json
-import numpy as np
+#import numpy as np
 
-debug = True
+debug = False
 
 def think(data):
     #this is where the work starts
@@ -32,7 +32,7 @@ def think(data):
     look(board_food, board_snakes, you_id, board_matrix, turn)
     direction = instincts(board_matrix, board_food)
     if debug == True:
-        print(np.matrix(board_matrix))
+        # print(np.matrix(board_matrix))
     return direction
 
 def look(board_food, board_snakes, you_id, board_matrix, turn):
@@ -213,7 +213,7 @@ def hunting(safe_choices, board_food,head_pos_x,head_pos_y):
         food_x = food_location[0]
         food_y = food_location[1]
     if debug:
-        print np.matrix(safe_choices)
+        # print np.matrix(safe_choices)
 
     if head_pos_x != food_x:
         if (head_pos_x > food_x):
@@ -308,8 +308,8 @@ def food_finder(board_food,head_pos_x,head_pos_y):
     if debug:
             if len(closest_food) != 2:
                 print "ERROR food_finder, food finder produced"
-                print (np.matrix(closest_food))
+                #print (np.matrix(closest_food))
             else:
                 print ("this is where the closest food is :")
-                print np.matrix(closest_food)
+                #print np.matrix(closest_food)
     return closest_food
