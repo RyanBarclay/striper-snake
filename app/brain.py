@@ -1,6 +1,6 @@
 import math
 import json
-#import numpy as np
+# import numpy as np
 
 debug = False
 
@@ -214,6 +214,7 @@ def hunting(safe_choices, board_food,head_pos_x,head_pos_y):
         food_y = food_location[1]
     if debug:
         # print np.matrix(safe_choices)
+        print("Hunting degug")
 
     if head_pos_x != food_x:
         if (head_pos_x > food_x):
@@ -308,8 +309,8 @@ def food_finder(board_food,head_pos_x,head_pos_y):
     if debug:
             if len(closest_food) != 2:
                 print "ERROR food_finder, food finder produced"
-                #print (np.matrix(closest_food))
+                # print (np.matrix(closest_food))
             else:
                 print ("this is where the closest food is :")
-                #print np.matrix(closest_food)
+                # print np.matrix(closest_food)
     return closest_food
