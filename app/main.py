@@ -34,19 +34,18 @@ def ping():
 @bottle.post('/start')
 def start():
     data = bottle.request.json
+
     """
     TODO: If you intend to have a stateful snake AI,
             initialize your snake state here using the
             request's data if necessary.
     """
-    # print(json.dumps(data))
 
-    color = "#ff69b4"
-    headType = "bendr"
-    tailType = "pixel"
+    color = "#FFC9F7"
+    head = "bendr"
+    tail = "fat-rattle"
 
-    # return start_response(color, headType, tailType)
-    return start_response(color):
+    return start_response(color, head, tail)
 
 
 @bottle.post('/move')
