@@ -33,6 +33,7 @@ def think(data):
     direction = instincts(board_matrix, board_food)
     if debug == True:
         # print(np.matrix(board_matrix))
+        print("think debug")
     return direction
 
 def look(board_food, board_snakes, you_id, board_matrix, turn):
