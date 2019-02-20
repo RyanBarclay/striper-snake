@@ -203,6 +203,10 @@ def move_check(safe_choices, head_pos_x, head_pos_y, board_matrix):
     if right_clear:
         safe_choices.append('right')
 
+    if not safe_choices:
+        safe_choices.append('up')
+        # this is only there if there are no safe choices... ie were dead
+
     return safe_choices
 
 def hunting(safe_choices, board_food,head_pos_x,head_pos_y):
