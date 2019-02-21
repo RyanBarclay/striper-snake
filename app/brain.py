@@ -88,11 +88,12 @@ def think(data):
     board_matrix = [[0 for x in range(board_width)] for y in range(board_height)]
     # this will make an array elements of widths. ie
     look(board_food, board_snakes, you_id, board_matrix, turn)
-    direction = instincts(board_matrix, board_food)
+
     if debug == True:
         # print(np.matrix(board_matrix))
         print("think debug")
-    return direction
+
+    return instincts(board_matrix, board_food)
 
 def look(board_food, board_snakes, you_id, board_matrix, turn):
 
@@ -270,8 +271,9 @@ def move_check(safe_choices, head_pos_x, head_pos_y, board_matrix):
 def hunting(safe_choices, board_food,head_pos_x,head_pos_y):
     food_location = food_finder(board_food,head_pos_x,head_pos_y)
     if len(food_location) == 0:
+        # if no food on board makes fake food in top left
         food_x = 0
-        food_y=0
+        food_y = 0
     else:
         food_x = food_location[0]
         food_y = food_location[1]
