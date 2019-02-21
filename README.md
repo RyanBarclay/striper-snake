@@ -9,25 +9,28 @@ This AI client uses the [bottle web framework](http://bottlepy.org/docs/dev/inde
 
 ###### This is a simple snake that might actualy stand a chance versus:
 
-1) snakes coded by groups of people
+1) Snakes coded by groups of people
 
-2) snakes coded by people who copy and paste alpha go (advanced game neural network AI)  looking at you [CBinners](https://github.com/cbinners)
+2) Snakes coded by people who copy and paste alpha go (advanced game neural network AI)  looking at you [CBinners](https://github.com/cbinners)
 
-3) snakes coded by people that are way better at coding then me
+3) Snakes coded by people that are way better at coding then me
 
 # Index
-
+* [State of AI](##State of AI)
+* [Running the Snake Locally](##Running the Snake Locally)
+* [Deploying to Heroku](##Deploying to Heroku)
+* [Questions?](##Questions?)
+* [License](##License)
 
 ## State of AI
 
   * 2019/02/13:
     * Basic AI complete
-      * snake finds closest food
-      * finds moves that won't make it die
-      * executes move that will align head vertically with food, else executes first move that is deemed ***safe***
+      * Snake finds closest food
+      * Finds moves that won't make it die
+      * Executes move that will align head vertically with food, else executes first move that is deemed ***safe***
     * App runs on [Heroku](http://heroku.com)
     * Clears all status checks on [play.battlesnake](https://play.battlesnake.io)
-
 
 ## Running the Snake Locally
 
@@ -76,3 +79,6 @@ heroku logs --tail
 ## Questions?
 
 Contact me [mrryanbarclay@gmail.com](mailto:mrryanbarclay@gmail.com) or contact [sendwithus](https://www.sendwithus.com) [battlesnake@sendwithus.com](mailto:battlesnake@sendwithus.com), [@send_with_us](http://twitter.com/send_with_us).
+
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
