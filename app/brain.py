@@ -5,14 +5,72 @@ import json
 debug = False
 
 def think(data):
-    #this is where the work starts
-    # just to make this snake not die we need it to just be able to play snake
+    """
+    function: think(data)
+        Description:
+            This function is the primary function of this file. It's directive,
+            is itemize all of the json data passed through the input. Then pass
+            on the necessary data for each function. The functions will need to
+            find the nearest food, find out if its the closest to that food
+            compared to other snakes, decide if it wants to go for the food,
+            will make a 'closed box' around that food, when it is going to die
+            will eat food, make a holding pattern 'closed box', then repeat.
+
+        Input:
+            data:
+                This is a json payload with with the api looking like:
+                    {
+                      "game": {
+                        "id": "game-id-string"
+                      },
+                      "turn": 4,
+                      "board": {
+                        "height": 15,
+                        "width": 15,
+                        "food": [
+                          {
+                            "x": 1,
+                            "y": 3
+                          }
+                        ],
+                        "snakes": [
+                          {
+                            "id": "snake-id-string",
+                            "name": "Sneky Snek",
+                            "health": 90,
+                            "body": [
+                              {
+                                "x": 1,
+                                "y": 3
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      "you": {
+                        "id": "snake-id-string",
+                        "name": "Sneky Snek",
+                        "health": 90,
+                        "body": [
+                          {
+                            "x": 1,
+                            "y": 3
+                          }
+                        ]
+                      }
+                    }
+
+        Returns:
+            direction: this will be  a string of 'up', 'down', 'left', or
+            'right'
+    """
+    # process data
     game = data['game']
     turn = data['turn']
     board = data['board']
     you = data['you']
 
-    # process data
+
     game_id = game['id']
 
     board_height = board['height']
@@ -41,7 +99,7 @@ def look(board_food, board_snakes, you_id, board_matrix, turn):
     """
     WHAT DIS DO:
 
-    This funtion is to take the array of x,y postions of food and the snakes at
+    This function is to take the array of x,y postions of food and the snakes at
     positions in their array and 'simulate' the board for easy calculations
 
     *   will put 'f' in array where there is a food pellet
@@ -101,7 +159,7 @@ def look(board_food, board_snakes, you_id, board_matrix, turn):
                     board_matrix[cur_snake_body_y][cur_snake_body_x] ='b'
             i += 1
         board_snakes_amount -= 1
-    #end of look funtion
+    #end of look function
 
 def instincts(board_matrix, board_food):
 

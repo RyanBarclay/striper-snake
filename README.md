@@ -1,26 +1,41 @@
-# starter-snake-python
 
-A simple [Battlesnake AI](http://battlesnake.io) written in Python. 
+# Striper-snake
 
-Visit [https://github.com/battlesnakeio/community/blob/master/starter-snakes.md](https://github.com/battlesnakeio/community/blob/master/starter-snakes.md) for API documentation and instructions for running your AI.
+This is a Snake entry for the [BattleSnake](http://battlesnake.io) programming competition in Victoria BC, written in Python.
 
-This AI client uses the [bottle web framework](http://bottlepy.org/docs/dev/index.html) to serve requests and the [gunicorn web server](http://gunicorn.org/) for running bottle on Heroku. Dependencies are listed in [requirements.txt](requirements.txt).
+Forked from the [Python starter snake](https://github.com/sendwithus/battlesnake-python) provided by [sendwithus](https://www.sendwithus.com).
 
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+This AI client uses the [bottle web framework](http://bottlepy.org/docs/dev/index.html) to serve requests and the [gunicorn web server](http://gunicorn.org/) for running bottle on [Heroku](https://heroku.com). Dependencies are listed in [requirements.txt](requirements.txt).
 
-#### You will need...
+###### This is a simple snake that might actualy stand a chance versus:
 
-* a working Python 2.7 development environment ([getting started guide](http://hackercodex.com/guide/python-development-environment-on-mac-osx/))
-* experience [deploying Python apps to Heroku](https://devcenter.heroku.com/articles/getting-started-with-python#introduction)
-* [pip](https://pip.pypa.io/en/latest/installing.html) to install Python dependencies
+1) snakes coded by groups of people
+
+2) snakes coded by people who copy and paste alpha go (advanced game neural network AI)  looking at you [CBinners](https://github.com/cbinners)
+
+3) snakes coded by people that are way better at coding then me
+
+# Index
+
+
+## State of AI
+
+  * 2019/02/13:
+    * Basic AI complete
+      * snake finds closest food
+      * finds moves that won't make it die
+      * executes move that will align head vertically with food, else executes first move that is deemed ***safe***
+    * App runs on [Heroku](http://heroku.com)
+    * Clears all status checks on [play.battlesnake](https://play.battlesnake.io)
+
 
 ## Running the Snake Locally
 
-1) [Fork this repo](https://github.com/battlesnakeio/starter-snake-python/fork).
+1) [Fork this repo](https://github.com/RyanBarclay/striper-snake/fork).
 
 2) Clone repo to your development environment:
 ```
-git clone git@github.com:<your github username>/starter-snake-python.git
+git clone git@github.com:username/battlesnake-python.git
 ```
 
 3) Install dependencies using [pip](https://pip.pypa.io/en/latest/installing.html):
@@ -33,10 +48,7 @@ pip install -r requirements.txt
 python app/main.py
 ```
 
-5) Test your snake by sending a curl to the running snake
-```
-curl -XPOST -H 'Content-Type: application/json' -d '{ "hello": "world"}' http://localhost:8080/start
-```
+5) Test client in your browser: [http://localhost:8080](http://localhost:8080).
 
 ## Deploying to Heroku
 
@@ -63,4 +75,4 @@ heroku logs --tail
 
 ## Questions?
 
-Email [battlesnake@sendwithus.com](mailto:battlesnake@sendwithus.com), or tweet [@send_with_us](http://twitter.com/send_with_us).
+Contact me [mrryanbarclay@gmail.com](mailto:mrryanbarclay@gmail.com) or contact [sendwithus](https://www.sendwithus.com) [battlesnake@sendwithus.com](mailto:battlesnake@sendwithus.com), [@send_with_us](http://twitter.com/send_with_us).
