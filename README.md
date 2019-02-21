@@ -16,11 +16,11 @@ This AI client uses the [bottle web framework](http://bottlepy.org/docs/dev/inde
 3) Snakes coded by people that are way better at coding then me
 
 # Index
-* [State of AI](#State of AI)
-* [Running the Snake Locally](#Running the Snake Locally)
-* [Deploying to Heroku](#Deploying to Heroku)
-* [Questions?](#Questions?)
-* [License](#License)
+* [State of AI](##state-of-ai)
+* [Running the Snake Locally](#running-the-snake-locally)
+* [Deploying to Heroku](#deploying-to-heroku)
+* [Questions?](#questions)
+* [License](#license)
 
 ## State of AI
 
