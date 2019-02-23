@@ -6,48 +6,36 @@ debug = False
 
 def think(data):
     """
-    function: think(data)
-        Description:
-            This function is the primary function of this file. It's directive,
-            is itemize all of the json data passed through the input. Then pass
-            on the necessary data for each function. The functions will need to
-            find the nearest food, find out if its the closest to that food
-            compared to other snakes, decide if it wants to go for the food,
-            will make a 'closed box' around that food, when it is going to die
-            will eat food, make a holding pattern 'closed box', then repeat.
+    Function: think(data)
 
-        Input:
-            data:
-                This is a json payload with with the api looking like:
-                    {
-                      "game": {
-                        "id": "game-id-string"
-                      },
-                      "turn": 4,
-                      "board": {
-                        "height": 15,
-                        "width": 15,
-                        "food": [
-                          {
-                            "x": 1,
-                            "y": 3
-                          }
-                        ],
-                        "snakes": [
-                          {
-                            "id": "snake-id-string",
-                            "name": "Sneky Snek",
-                            "health": 90,
-                            "body": [
-                              {
-                                "x": 1,
-                                "y": 3
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      "you": {
+    Description:
+        This function is the primary function of this file. It's directive,
+        is itemize all of the json data passed through the input. Then pass
+        on the necessary data for each function. The functions will need to
+        find the nearest food, find out if its the closest to that food
+        compared to other snakes, decide if it wants to go for the food,
+        will make a 'closed box' around that food, when it is going to die
+        will eat food, make a holding pattern 'closed box', then repeat.
+
+    Input:
+        data:
+            This is a json payload with with the api looking like:
+                {
+                  "game": {
+                    "id": "game-id-string"
+                  },
+                  "turn": 4,
+                  "board": {
+                    "height": 15,
+                    "width": 15,
+                    "food": [
+                      {
+                        "x": 1,
+                        "y": 3
+                      }
+                    ],
+                    "snakes": [
+                      {
                         "id": "snake-id-string",
                         "name": "Sneky Snek",
                         "health": 90,
@@ -58,11 +46,24 @@ def think(data):
                           }
                         ]
                       }
-                    }
+                    ]
+                  },
+                  "you": {
+                    "id": "snake-id-string",
+                    "name": "Sneky Snek",
+                    "health": 90,
+                    "body": [
+                      {
+                        "x": 1,
+                        "y": 3
+                      }
+                    ]
+                  }
+                }
 
-        Returns:
-            direction: this will be  a string of 'up', 'down', 'left', or
-            'right'
+    Returns:
+        direction: this will be  a string of 'up', 'down', 'left', or 'right'
+
     """
     # process data
     game = data['game']
@@ -161,7 +162,6 @@ def look(board_food, board_snakes, you_id, board_matrix, turn):
             i += 1
         board_snakes_amount -= 1
     #end of look function
-
 def instincts(board_matrix, board_food):
 
     # will find my head and tell me where it is and exit x,y
@@ -198,8 +198,10 @@ def instincts(board_matrix, board_food):
 
 def move_check(safe_choices, head_pos_x, head_pos_y, board_matrix):
     """
-    This will return a pool of moves that are acceptable as moves and return it
+    This will return an array of moves that are acceptable as moves and return it
     as a list of those moves as strings acceptable as /move entries
+
+    If there are no safe_choices left up will be the default choice
     """
 
     temp_token = board_matrix[0]
@@ -268,8 +270,8 @@ def move_check(safe_choices, head_pos_x, head_pos_y, board_matrix):
 
     return safe_choices
 
-def hunting(safe_choices, board_food,head_pos_x,head_pos_y):
-    food_location = food_finder(board_food,head_pos_x,head_pos_y)
+def hunting(safe_choices, board_food, head_pos_x, head_pos_y):
+    food_location = food_finder(board_food, head_pos_x, head_pos_y)
     if len(food_location) == 0:
         # if no food on board makes fake food in top left
         food_x = 0
@@ -337,9 +339,21 @@ def hunting(safe_choices, board_food,head_pos_x,head_pos_y):
             else:
                 return safe_choices[0]
 
-def food_finder(board_food,head_pos_x,head_pos_y):
+def food_finder(board_food, head_pos_x, head_pos_y):
     """
-    find the closest food in a list = [x,y]
+    This function should return food Coords in a list = [x,y] this food will be the food that gives the smallest value to the following formula:
+    x = (distance from my head to food) + (distance from closest ememy snake head to that food)
+    This should make it so the snake knows what food it is most likely to get. Moreover, this function will also return a boolian value to tell code if it is the closest to this food ie if y is +/-:
+    y = (distance from my head to selected food) - (distance from closest ememy snake head to that food)
+    if y + it is the closest compared to all other snakes
+
+    Input:
+        board_food:
+            list of { {[x: #][y: #]}, ...}
+        you_id:
+            id of my snake as a string
+        board_snakes:
+            reffer to think(date) explanation
     """
     food_amount = len(board_food)
     closest_food = []
@@ -373,6 +387,7 @@ def food_finder(board_food,head_pos_x,head_pos_y):
 
     if debug:
             if len(closest_food) != 2:
+                #if the length of the array closest_food isn't 2 then something went wrong
                 print "ERROR food_finder, food finder produced"
                 # print (np.matrix(closest_food))
             else:
