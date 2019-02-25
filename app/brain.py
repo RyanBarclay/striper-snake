@@ -1,6 +1,5 @@
 import math
 import json
-
 #to make this work on heroku you must search for all instances of "*HEROKU_REMOVE*" and comment the line under them
 
 #*HEROKU_REMOVE*
@@ -117,7 +116,6 @@ def think(data):
 
 
     return choice
-    # return instincts(board_matrix, board_food)
 
 def look(board_food, board_snakes, you_id, board_matrix, turn):
     """
@@ -159,15 +157,12 @@ def look(board_food, board_snakes, you_id, board_matrix, turn):
         food_token = board_food[food_amount-1]
         food_x = food_token['x']
         food_y = food_token['y']
-        # print food_x
-        # print food_y
         # board_matrix[height index][width index]
         board_matrix[food_y][food_x] = 'f'
         food_amount -= 1
 
     # now to do the snakes on board
     board_snakes_amount = len(board_snakes)
-    # print board_snakes_amount
 
     while board_snakes_amount > 0:
         cur_snake = board_snakes[board_snakes_amount-1]
@@ -207,7 +202,14 @@ def look(board_food, board_snakes, you_id, board_matrix, turn):
         print("-------------------")
         #debug print out
         print("look edits:")
-        print("board_matrix: %s" % (board_matrix))
+        print("board_matrix:")
+
+        #use this when you want debug but are on heroku
+        # print(board_matrix)
+
+        #*HEROKU_REMOVE*
+        print(np.matrix(board_matrix))
+
         print("-------------------")
 
 def move_check(head_xy, board_matrix):
