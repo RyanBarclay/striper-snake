@@ -1,5 +1,9 @@
 import math
 import json
+
+#to make this work on heroku you must search for all instances of "*HEROKU_REMOVE*" and comment the line under them
+
+#*HEROKU_REMOVE*
 import numpy as np
 
 debug = True
@@ -57,7 +61,7 @@ def think(data):
                   }
                 }
 
-    Returns:
+    Output:
         direction: this will be  a string of 'up', 'down', 'left', or 'right'
 
     """
@@ -83,34 +87,69 @@ def think(data):
     you_body = you['body']
 
     if debug:
-        print(you_name)
+        print("\nname: %s" % (you_name))
+        print("-------------------")
 
     board_matrix = [[0 for x in range(board_width)] for y in range(board_height)]
     # this will make an array elements of widths. ie
     look(board_food, board_snakes, you_id, board_matrix, turn)
+
     food_location, closest = food_finder(board_food, you_id, board_snakes)
+    head_xy = head_finder(board_matrix)
+    safe_moves = move_check(head_xy, board_matrix)
+    moves, box = go_to_food(safe_moves,board_food,head_xy)
 
-    if debug:
-        # print("think debug:")
-        # print(np.matrix(board_matrix))
-        pass
+    """
+    REMOVE LATER
+    """
+    if len(moves) == 0:
+        choice = 'up'
+    else:
+        choice = moves[0]
 
-    return 'up'
+    if debug == True:
+        print("\nthink DEBUG:")
+        print("-------------------")
+        #debug print out
+        print("think retuns returns:")
+        print("choice: %s" % (choice) )
+        print("-------------------")
+
+
+    return choice
     # return instincts(board_matrix, board_food)
 
 def look(board_food, board_snakes, you_id, board_matrix, turn):
-
     """
-    WHAT DIS DO:
+    Function:
+        look()
+    Description:
+        This function is to take the array of x,y postions of food and the snakes at positions in their array and 'simulate' the board for easy calculations
 
-    This function is to take the array of x,y postions of food and the snakes at
-    positions in their array and 'simulate' the board for easy calculations
+        *   will put 'f' in array where there is a food pellet
+        *   will put 'h' if head of snake
+        *   will put 't' if tale of snake
+        *   will put 'b' if body of snake
+        *   will put '0' if empty space
+    Input:
+        board_food:
+            list of { {[x: #][y: #]}, ...}
 
-    *   will put 'f' in array where there is a food pellet
-    *   will put 'h' if head of snake
-    *   will put 't' if tale of snake
-    *   will put 'b' if body of snake
-    *   will put '0' if empty space
+        board_snakes:
+            reffer to think(date) explanation
+
+        you_id:
+            this is a string that identifies my snake
+
+        board_matrix:
+            this is an list of lists that represents the current board of Battle snake
+
+        turn:
+            this is an int that represents the turn in the game
+
+    Output:
+        alters board_matrix with current data
+
     """
 
     # we are going to do the food first
@@ -163,18 +202,38 @@ def look(board_food, board_snakes, you_id, board_matrix, turn):
                     board_matrix[cur_snake_body_y][cur_snake_body_x] ='b'
             i += 1
         board_snakes_amount -= 1
+    if debug == True:
+        print("\nlook DEBUG:")
+        print("-------------------")
+        #debug print out
+        print("look edits:")
+        print("board_matrix: %s" % (board_matrix))
+        print("-------------------")
 
-def move_check(safe_choices, head_pos_x, head_pos_y, board_matrix):
+def move_check(head_xy, board_matrix):
     """
-    This will return an array of moves that are acceptable as moves and return it
-    as a list of those moves as strings acceptable as /move entries
+    Function:
+        move_check()
+    Description:
+        will find what are outputs for move that won't instantly kill the snake
+    Input:
+        head_xy:
+            This is a list containing two elements: x,y. These coords are the location of your head in the board matrix
 
-    If there are no safe_choices left up will be the default choice
+        board_matrix:
+            This is an list of lists that represents the current board of Battle snake
+    Output:
+        safe_choices:
+            This is an list of moves that won't imediatlty kill the board_snakes
+                ***IF THIS IS EMPTY****
+                snake is dead because there are no safe moves
+
     """
-    
-    """
-    TODO: Update to new style of funtion passing
-    """
+
+    head_pos_x = head_xy[0]
+    head_pos_y = head_xy[1]
+
+    safe_choices = []
 
     temp_token = board_matrix[0]
 
@@ -188,7 +247,7 @@ def move_check(safe_choices, head_pos_x, head_pos_y, board_matrix):
     left_clear = True
     right_clear = True
 
-    danger_elements = ['h','b','mb','t','mt']
+    danger_elements = ['h','b','mb','t']
 
 
     #if up is a bad move, remove it as an option
@@ -236,9 +295,13 @@ def move_check(safe_choices, head_pos_x, head_pos_y, board_matrix):
     if right_clear:
         safe_choices.append('right')
 
-    if not safe_choices:
-        safe_choices.append('up')
-        # this is only there if there are no safe choices... ie were dead
+    if debug == True:
+        print("\nmove_check DEBUG:")
+        print("-------------------")
+        #debug print out
+        print("move_check returns:")
+        print("safe_choices: %s" % (safe_choices) )
+        print("-------------------")
 
     return safe_choices
 
@@ -330,33 +393,41 @@ def food_finder(board_food, you_id, board_snakes):
         closest_in_comparison = False
 
     if debug:
+            print("\nfood_finder DEBUG:")
+            print("-------------------")
             print("This is the list distance_list:")
-            print(np.matrix(distance_list))
+            print(distance_list)
             print("This is the return entries of food_finder:")
             print("closest_food: %s" % (closest_food))
             print("closest_in_comparison: %s" % (closest_in_comparison))
+            print("-------------------")
 
     return closest_food, closest_in_comparison
 
-def instincts(board_matrix, board_food):
+def head_finder(board_matrix):
     """
-    TODO: Retire this funtion
-    """
+    Function:
+        head_finder()
+    Description:
+        this will find the head of your snake
+    Input:
+        board_matrix:
+            this is an list of lists that represents the current board of Battle snake
+    Output:
+        head_xy:
+            this is a list containing two elements: x,y. These coords are the location of your head in the board matrix
 
-    # will find my head and tell me where it is and exit x,y
+    """
     head_pos_y = len(board_matrix)-1
     head_token = board_matrix[0]
     head_pos_x = len(head_token)-1
     x_max = head_pos_x
-    element = 'mh'
+    head_indicator = 'mh'
     end = False
-    safe_choices = []
 
-
-    # this finds the head .... hopefully no bugs
     while head_pos_y >= 0:
         while head_pos_x >= 0:
-            if board_matrix[head_pos_y][head_pos_x] == element:
+            if board_matrix[head_pos_y][head_pos_x] == head_indicator:
                 end = True
                 break
             else:
@@ -366,84 +437,73 @@ def instincts(board_matrix, board_food):
         else:
             head_pos_y -= 1
             head_pos_x = x_max
-    # end of find head loop
+    head_xy = [head_pos_x, head_pos_y]
 
     if debug == True:
-        print "head of snake x:%d ,y:%d" %(head_pos_x,head_pos_y)
+        print("\nhead_finder DEBUG:")
+        print("-------------------")
+        #debug print out
+        print("head_finder returns:")
+        print("head_xy: %s" % (head_xy) )
+        print("-------------------")
 
-    safe_choices = move_check(safe_choices, head_pos_x, head_pos_y, board_matrix)
+    return head_xy
 
-
-    return hunting(safe_choices, board_food,head_pos_x,head_pos_y)
-
-def hunting(safe_choices, board_food, head_pos_x, head_pos_y):
+def go_to_food(safe_choices, board_food, head_xy):
     """
-    TODO: Retire this funtion
-    """
-    food_location = food_finder(board_food, head_pos_x, head_pos_y)
-    if len(food_location) == 0:
-        # if no food on board makes fake food in top left
-        food_x = 0
-        food_y = 0
-    else:
-        food_x = food_location[0]
-        food_y = food_location[1]
-    if debug:
-        # print np.matrix(safe_choices)
-        print("Hunting degug")
+    Function:
+        go_to_food()
+    Description:
+        this will go make the snake go to food and tell us if the snake is ready to make a 'box' around food
 
-    if head_pos_x != food_x:
-        if (head_pos_x > food_x):
-            #if head_pos_x is > food, head is to the right of food
-            if 'left' in safe_choices:
-                return 'left'
-            else:
-                #check y alignment and see if thats a move otherwise do first
-                #element in safe_choices
-                #this is when it right above food
-                if head_pos_y > food_y:
-                    #if head > food_y, go up check
-                    if 'up' in safe_choices:
-                        return 'up'
-                    else:
-                        return safe_choices[0]
-                else:
-                    #if head < food_y, go down check
-                    if 'down' in safe_choices:
-                        return 'down'
-                    else:
-                        return safe_choices[0]
-        else:
-            #if head_pos_x is < food, head is to the right of food
-            if 'right' in safe_choices:
-                return 'right'
-            else:
-                #check y alignment and see if thats a move otherwise do first
-                #element in safe_choices
-                #this is when it right above food
-                if head_pos_y > food_y:
-                    #if head > food_y, go up check
-                    if 'up' in safe_choices:
-                        return 'up'
-                    else:
-                        return safe_choices[0]
-                else:
-                    #if head < food_y, go down check
-                    if 'down' in safe_choices:
-                        return 'down'
-                    else:
-                        return safe_choices[0]
-    else:
-        #this is when it right above food
-        if head_pos_y > food_y:
-            #if head > food_y, go up check
-            if 'up' in safe_choices:
-                return 'up'
-            else:
-                return safe_choices[0]
-        else:
-            #if head < food_y, go down check
-            if 'down' in safe_choices:
-                return 'down'
-            else:
-                return safe_choices[0]
+        Algorithm:
+            1. is snake diagnal with food?
+                a.  if so return a move that will get it closer to diagnal and false to the ready_to_box boolian
+
+                b.  else go to 2
+            2. is the food two diagnal blocks away?
+                a. if so return move as empty and return True to ready_to_box boolian
+
+                b. else go to 3
+            3. return a move that wont kill it and will go diagnal
+
+    Input:
+        safe_choices:
+            This is an list of moves that won't imediatlty kill the snake.
+                ***IF THIS IS EMPTY****
+                snake is dead because there are no safe moves.
+
+        board_food:
+            list of { {[x: #][y: #]}, ...}
+
+        head_xy:
+            This is a list containing two elements: x,y. These coords are the location of your head in the board matrix.
+
+    Output:
+        move:
+            this will be move that it picks in a list format.
+                ***IF EMPTY***
+                ready to protect food.
+
+        ready_to_box:
+            this is a boolian that will tell us if the snake is ready to protect food.
+
+    """
+    #process input
+    head_pos_x = head_xy[0]
+    head_pos_y = head_xy[1]
+
+    #establish local varibles
+    move = []
+    ready_to_box = False
+
+    if debug == True:
+        print("\ngo_to_food DEBUG:")
+        print("-------------------")
+        #debug print out
+        print("go_to_food returns:")
+        print("move: %s" % (move))
+        print("ready_to_box: %s" % (ready_to_box))
+        print("-------------------")
+
+    return move, ready_to_box
