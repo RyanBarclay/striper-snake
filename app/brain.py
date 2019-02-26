@@ -3,9 +3,9 @@ import json
 #to make this work on heroku you must search for all instances of "*HEROKU_REMOVE*" and comment the line under them
 
 #*HEROKU_REMOVE*
-import numpy as np
+# import numpy as np
 
-debug = True
+debug = False
 
 def think(data, inLoop, foodTrapped):
     """
@@ -132,8 +132,10 @@ def think(data, inLoop, foodTrapped):
     """
 
     moves, box = go_to_food(safe_moves, food_location, head_xy)
-    if len(moves) == 0:
-        choice = 'up'
+    if box:
+        choice = eat_food(head_xy,food_location)
+        print("Temp return")
+        print(choice)
     else:
         choice = moves[0]
 
@@ -238,7 +240,7 @@ def look(board_food, board_snakes, you_id, board_matrix, turn):
         # print(board_matrix)
 
         #*HEROKU_REMOVE*
-        print(np.matrix(board_matrix))
+        # print(np.matrix(board_matrix))
 
         print("-------------------")
 
@@ -613,16 +615,37 @@ def go_to_food(safe_choices, food_location, head_xy):
     elif diagnal:
         #2a
         ready_to_box = False
-        #debug print out
-        if debug is True:
-            print("\ngo_to_food DEBUG:")
-            print("-------------------")
-            print("go_to_food returns:")
-            print("move: %s" % (move))
-            print("ready_to_box: %s" % (ready_to_box))
-            print("-------------------")
-        return move, ready_to_box
-        pass
+        move_element = move[0]
+
+        #dumb move check
+        if move_element in safe_choices:
+            #debug print out
+            if debug is True:
+                print("\ngo_to_food DEBUG:")
+                print("-------------------")
+                print("go_to_food returns:")
+                print("move: %s" % (move))
+                print("ready_to_box: %s" % (ready_to_box))
+                print("-------------------")
+            return move, ready_to_box
+        else:
+            move = []
+            if len(safe_choices) is 0:
+                move.append('up')
+                #were dead
+            else:
+                move_element = safe_choices[0]
+                move.append(move_element)
+            #debug print out
+            if debug is True:
+                print("\ngo_to_food DEBUG:")
+                print("-------------------")
+                print("go_to_food returns:")
+                print("move: %s" % (move))
+                print("ready_to_box: %s" % (ready_to_box))
+                print("area: %s" % (areaNumber))
+                print("-------------------")
+            return move,ready_to_box
     else:
         """
         TODO:
@@ -706,3 +729,25 @@ def go_to_food(safe_choices, food_location, head_xy):
                 print("area: %s" % (areaNumber))
                 print("-------------------")
             return move,ready_to_box
+
+def eat_food(head_xy, food_location):
+    """
+    REMOVE IN FINAL VERSION
+    """
+    head_pos_x = head_xy[0]
+    head_pos_y = head_xy[1]
+    food_x = food_location['x']
+    food_y = food_location['y']
+    if head_pos_y < food_y:
+        #if above or in top 2 corners go down
+        move = 'down'
+    elif head_pos_y > food_y:
+        #if below or in bottom two corners do up
+        move = 'up'
+    elif head_pos_x > food_x:
+        #if right go left
+        move = 'left'
+    elif head_pos_x < food_x:
+        #if left go right
+        move = 'right'
+    return move
