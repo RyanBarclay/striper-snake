@@ -6,6 +6,10 @@ import bottle
 from api import ping_response, start_response, move_response, end_response
 from brain import think
 
+#globals:
+inLoop =  False
+foodTrapped =  False
+
 @bottle.route('/')
 def index():
     return '''
@@ -53,7 +57,11 @@ def move():
     data = bottle.request.json
     # print(json.dumps(data))
     # directions = ['up', 'down', 'left', 'right']
-    direction = think(data)
+    global inLoop
+    global foodTrapped
+    # print(inLoop)
+    # print(foodTrapped)
+    direction, inLoop, foodTrapped = think(data, inLoop, foodTrapped)
     # print direction
     return move_response(direction)
 
