@@ -526,6 +526,7 @@ def go_to_food(safe_choices, food_location, head_xy):
                 b.  else go to 1
 
             3.return a move that wont kill it and will try and bring it closer to diagnal go diagnal. if it is going to die will go up.
+                -8  possible outcomes for going to closest diagnal. reffer to documentation folder for area numbers and logic
 
     Input:
         safe_choices:
@@ -558,13 +559,12 @@ def go_to_food(safe_choices, food_location, head_xy):
     ready_to_box = False
     diagnal = False
     inSquare = False
-    print(food_location)
     food_x = food_location['x']
     food_y = food_location['y']
     areaNumber = 0
 
-    delta_x = food_x - head_pos_x
-    delta_y = head_pos_y - food_y
+    delta_x = head_pos_x - food_x
+    delta_y = food_y - head_pos_y
 
     # start of logic
 
@@ -589,7 +589,7 @@ def go_to_food(safe_choices, food_location, head_xy):
         #is diagnal either top Q2 or Q4
         diagnal = True
 
-    if delta_y < 0:
+    if delta_y > 0:
         #if in  q1 or q2 goes down
         move.append('down')
     else:
@@ -632,45 +632,49 @@ def go_to_food(safe_choices, food_location, head_xy):
         #make snake move closer to the diagnal and avoid obsticles
         move = []
         ready_to_box =  False
+        print("This is the 3rd case")
+        print("delta_y: %s" % (delta_y))
+        print("delta_x: %s" % (delta_x))
+
         if delta_y >= 0:
             #top half of cases
             if delta_x >= 0:
                 if abs(delta_x) < abs(delta_y):
                     #2
                     areaNumber = 2
-                    move.append('right')
+                    move.append('down')
                 else:
                     #1
                     areaNumber = 1
-                    move.append('up')
+                    move.append('left')
             else:
                 if abs(delta_x) < abs(delta_y):
                     #3
                     areaNumber = 3
-                    move.append('left')
+                    move.append('down')
                 else:
                     #4
                     areaNumber = 4
-                    move.append('up')
+                    move.append('right')
         else:
             if delta_x >= 0:
                 if abs(delta_x) < abs(delta_y):
                     #7
                     areaNumber = 7
-                    move.append('right')
+                    move.append('up')
                 else:
                     #8
                     areaNumber = 8
-                    move.append('down')
+                    move.append('left')
             else:
                 if abs(delta_x) < abs(delta_y):
                     #6
                     areaNumber = 6
-                    move.append('left')
+                    move.append('up')
                 else:
                     #5
                     areaNumber = 5
-                    move.append('down')
+                    move.append('right')
         #move will be equal to what it should be returning in a prefect world
         move_element = move[0]
         if move_element in safe_choices:
