@@ -1,11 +1,11 @@
 import math
 import json
-#to make this work on heroku you must search for all instances of "*HEROKU_REMOVE*" and comment the line under them
+#To make this work on heroku you must search for all instances of "*HEROKU_REMOVE*" and comment the line under them
 
 #*HEROKU_REMOVE*
-# import numpy as np
+import numpy as np
 
-debug = False
+debug = True
 
 def think(data, inLoop, foodTrapped):
     """
@@ -74,7 +74,7 @@ def think(data, inLoop, foodTrapped):
         foodTrapped:
             Boolian value will be set to true when snake trapped food
     """
-    # process data
+    #Process data
     game = data['game']
     turn = data['turn']
     board = data['board']
@@ -94,6 +94,7 @@ def think(data, inLoop, foodTrapped):
     you_name = you['name']
     you_health = you['health']
     you_body = you['body']
+    you_length = len(you_body)
 
     if debug:
         print("\nname: %s" % (you_name))
@@ -101,41 +102,99 @@ def think(data, inLoop, foodTrapped):
         print("-------------------")
 
     board_matrix = [[0 for x in range(board_width)] for y in range(board_height)]
-    # this will make an array elements of widths. ie
+    #This will make an array elements of widths. ie
 
     look(board_food, board_snakes, you_id, board_matrix, turn)
     head_xy = head_finder(board_matrix)
-    #initialize board representation and find my head
+    #Initialize board representation and find my head
 
     food_location, closest = food_finder(board_food, you_id, board_snakes)
-    #look for closest food and look if your the closest
+    #Look for closest food and look if your the closest
 
     safe_moves = move_check(head_xy, board_matrix, turn)
-    #finds acceptiable moves
+    #Finds acceptiable moves
 
+    choice = 'up'
+    #initializes the outputs
+
+    adolescence = [3,4,5,6]
+    if you_length in adolescence:
+        young = True
+    else:
+        young = False
 
     if inLoop is True:
-        #if in loop/holding pattern do this
+        #If in loop/holding pattern do this
         if foodTrapped is True:
-            #if in a loop and has already trapped food
+            #If in a loop and has already trapped food
+            #Check if it wants to eat food yet based off of health
+            #Eats food starts to happen if health threshhold is met
             pass
+            #checkIfNeedToEat
+                #yes
+                #eatFoodInLoop function
+                #no
+                #stayInLoop function
+
         else:
-            #if in loop and has already eaten food
+            #If in loop and has already eaten food or is young
+            #Snake should stay in the loop untill it can get food and it knows it can
             pass
+            #checkIfNeedToEat, this needs to check if no food (if so no is ans)
+                #yes
+                #goEatFood funtion,  inloop = false
+                #no
+                #if safe to go to food
+                    #yes
+                    #go_to_food, inloop = false
+                    #no
+                    #Stayinloop function
     else:
-        #if not in loop/holding patern go and get food
-        pass
+        #If not in loop/holding patern do this
+        if young is True:
+            #too young to make a food loop so it will
+            # 1. Is it the start(first 4 moves), if so loop with its self
+            # 2. Check if closest for food. if so will go and eat food
+            # 3. Make a loop with its self
+            pass
+            if(turn <= 2):
+                #is it in the first 3 moves
+                choice = makeFirstLoop(inLoop, board_matrix, safe_moves, turn, head_xy)
+                """REMOVE"""
+                return choice, inLoop, foodTrapped
+                pass
+            else:
+                pass
+
+
+        else:
+            #Go and get food because it has already decided
+            moves, box_ready = go_to_food(safe_moves, food_location, head_xy)
+            if box_ready is True:
+                #ignore move and start making a loop
+                    #if this makes a loop makes inLoop true
+                pass
+            else:
+                #go to food
+                choice = moves[0]
+                pass
     #end of logic tree
 
     """
-    TODO: remove the code below that is in this else fragment
+    KNOWN PROBLEMS:
+        * When snake goes to get food and it is eaten for some reason it doesnt have know explicitly what to do
+        * If a food spawns in the one/two spaces that it leaves to eat food it no explicit instance
+    """
+
+    """
+    TODO: remove the code below that is in this if/else, go_to_food call fragment
     """
 
     moves, box = go_to_food(safe_moves, food_location, head_xy)
     if box:
-        choice = eat_food(head_xy,food_location)
-        print("Temp return")
-        print(choice)
+        choice = eat_food(head_xy,food_location, safe_moves)
+        #print("Temp return")
+        #print(choice)
     else:
         choice = moves[0]
 
@@ -240,7 +299,7 @@ def look(board_food, board_snakes, you_id, board_matrix, turn):
         # print(board_matrix)
 
         #*HEROKU_REMOVE*
-        # print(np.matrix(board_matrix))
+        print(np.matrix(board_matrix))
 
         print("-------------------")
 
@@ -284,11 +343,7 @@ def move_check(head_xy, board_matrix, turn):
     left_clear = True
     right_clear = True
 
-    danger_elements = ['h','b','mb','t','mt']
-
-    if turn != 1:
-        danger_elements.remove('mt')
-        #removes base cases
+    danger_elements = ['h','b','mb','t']
 
     #if up is a bad move, remove it as an option
     if head_pos_y == top_edge:
@@ -350,7 +405,7 @@ def food_finder(board_food, you_id, board_snakes):
     This function should return food Coords in a list = [x,y] this food will be the food that gives the  value to the following formula:
     this works because the value with
 
-    if no food on board then will return empty list and a flase on the boolian
+    if no food on board then will return [0,0] and a flase on the boolian
 
     Input:
         board_food:
@@ -359,6 +414,11 @@ def food_finder(board_food, you_id, board_snakes):
             id of my snake as a string
         board_snakes:
             reffer to think(date) explanation
+    """
+
+    """
+    TODO:
+        order distance_list in order of greatest distance to smallest distance
     """
     food_index = len(board_food) - 1
     closest_in_comparison = False
@@ -371,6 +431,19 @@ def food_finder(board_food, you_id, board_snakes):
 
     if len(board_food) == 0:
         # if no food
+        closest_food = {'y': 0, 'x': 0}
+        if debug:
+            print("\nfood_finder DEBUG:")
+            print("-------------------")
+            print("This is the list distance_list:")
+            print(distance_list)
+            print("This is the board_food")
+            print(board_food)
+            print("This is the return entries of food_finder:")
+            print("closest_food: %s" % (closest_food))
+            print("closest_in_comparison: %s" % (closest_in_comparison))
+            print("-------------------")
+
         return closest_food, closest_in_comparison
 
     while food_index >= 0:
@@ -647,17 +720,10 @@ def go_to_food(safe_choices, food_location, head_xy):
                 print("-------------------")
             return move,ready_to_box
     else:
-        """
-        TODO:
-        Fix how it realigns to diagnal and goes to diagnal
-        """
         #3
         #make snake move closer to the diagnal and avoid obsticles
         move = []
         ready_to_box =  False
-        print("This is the 3rd case")
-        print("delta_y: %s" % (delta_y))
-        print("delta_x: %s" % (delta_x))
 
         if delta_y >= 0:
             #top half of cases
@@ -730,7 +796,61 @@ def go_to_food(safe_choices, food_location, head_xy):
                 print("-------------------")
             return move,ready_to_box
 
-def eat_food(head_xy, food_location):
+def makeFirstLoop(inLoop, board_matrix, safe_moves, turn, head_xy):
+    """
+    Function:
+        makeFirstLoop()
+    Description:
+        Will handle the the first 3 moves of the snake in order to make a loop that won't kill it in these moves
+
+        There is only a problem when the board is 7x7 so this will be a basecase. The good news is that any bigger we can just do a basic loop
+    Input:
+    Output:
+        choice:
+            a string that is either 'up', 'down', 'right', 'left'
+    """
+
+    #find how big board is
+    board_height = len(board_matrix)
+
+    #edit choice
+    if(board_height > 7):
+        #if not 7x7 case do this
+        if turn == 0:
+            choice = 'up'
+        elif turn == 1:
+            choice = 'left'
+        else:
+            choice = 'down'
+    else:
+        #if 7x7 case
+
+        #get my head
+        my_head_x = head_xy[0]
+        my_head_y = head_xy[1]
+
+    #check for danger
+    if choice in safe_moves:
+        choice = choice
+    else:
+        choice = safe_moves[0]
+    #decided if in loop
+    if turn == 3:
+        inLoop = True
+    else:
+        inLoop = False
+
+    #debug print out
+    if debug is True:
+        print("\nmakeFirstLoop DEBUG:")
+        print("-------------------")
+        print("inLoop = %s" % (inLoop))
+        print("makeFirstLoop returns:")
+        print("choice: %s" % (choice) )
+        print("-------------------")
+    return  choice
+
+def eat_food(head_xy, food_location, safe_moves):
     """
     REMOVE IN FINAL VERSION
     """
@@ -750,4 +870,9 @@ def eat_food(head_xy, food_location):
     elif head_pos_x < food_x:
         #if left go right
         move = 'right'
-    return move
+
+    if move in safe_moves:
+        return move
+    else:
+        move = safe_moves[0]
+        return move
