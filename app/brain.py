@@ -164,7 +164,13 @@ def think(data, inLoop, foodTrapped):
                 return choice, inLoop, foodTrapped
                 pass
             else:
-                pass
+                if(you_health > 90):
+                    #go into loop
+                    pass
+                else:
+                    #2
+                    #3
+                    pass
 
 
         else:
