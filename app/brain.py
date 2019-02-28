@@ -416,10 +416,6 @@ def food_finder(board_food, you_id, board_snakes):
             reffer to think(date) explanation
     """
 
-    """
-    TODO:
-        order distance_list in order of greatest distance to smallest distance
-    """
     food_index = len(board_food) - 1
     closest_in_comparison = False
     closest_food = []
@@ -451,7 +447,7 @@ def food_finder(board_food, you_id, board_snakes):
         food_token = board_food[food_index]
         food_x = food_token['x']
         food_y = food_token['y']
-        element = [0,0]
+        element = [0,0,0]
         #initializes elements to be loaded into distance_list
 
         snake_index = len(board_snakes) - 1
@@ -483,23 +479,50 @@ def food_finder(board_food, you_id, board_snakes):
                     #if the this enemy snake is closer than the current closest one, replace it
                     element[1] = diffrence
             snake_index -= 1
-        distance_list.insert(0,element)
+        element[2] = food_index
+        distance_list.append(element)
         # distance_list.append(element)
         food_index -= 1
     # now there is a list of lists with my distance to food and the closest enemy to the food as elements
     distance_list_index = len(distance_list)-1
+    sorted = []
+    while True:
+        sorted_end = len(sorted) - 1
+        if distance_list_index == sorted_end:
+            #if I have passed all elements to the new list
+            break
+        #this will sort distance_list and put the greatest diffrence as last
+        token = distance_list[0]
+        #looks at first
+        mysnake_distance = token[0]
+        enemy_distance = token[1]
+        diffrence = enemy_distance - mysnake_distance
+        if sorted_end == -1:
+            #base case
+            greatest_diffrence = diffrence
 
+        if greatest_diffrence <= diffrence:
+            sorted.append(token)
+            greatest_diffrence = diffrence
+            del distance_list[0]
+
+        else:
+            sorted.insert(0,token)
+            del distance_list[0]
+
+    distance_list = sorted
     while distance_list_index >= 0:
         #this will find the largest x value as stated above
         token = distance_list[distance_list_index]
         mysnake_distance = token[0]
         enemy_distance = token[1]
+        food_reffrence_index = token[2]
         # print("mysnake_distance: %s" % (mysnake_distance))
         # print("ememy_distance: %s" % (enemy_distance))
         if (mysnake_distance+ padding) < enemy_distance:
-            #I am the closest to this food compared to the closest enemy to this food
+            #I am last element that is closer to the food plus padding
             closest_in_comparison = True
-            closest_food = board_food[distance_list_index]
+            closest_food = board_food[food_reffrence_index]
             if debug:
                 print("\nfood_finder DEBUG:")
                 print("-------------------")
@@ -517,11 +540,11 @@ def food_finder(board_food, you_id, board_snakes):
             if distance_list_index == (len(distance_list)-1):
                 #first time in loop
                 smallest_distance = distance_list[0]
-                closest_food = board_food[distance_list_index]
+                closest_food = board_food[food_reffrence_index]
             else:
                 if smallest_distance > distance_list[0]:
                     smallest_distance = distance_list[0]
-                    closest_food = board_food[distance_list_index]
+                    closest_food = board_food[food_reffrence_index]
         distance_list_index -= 1
     if debug:
         print("\nfood_finder DEBUG:")
