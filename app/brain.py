@@ -3,9 +3,9 @@ import json
 #To make this work on heroku you must search for all instances of "*HEROKU_REMOVE*" and comment the line under them
 
 #*HEROKU_REMOVE*
-import numpy as np
+# import numpy as np
 
-debug = True
+debug = False
 
 def think(data, inLoop, foodTrapped):
     """
@@ -299,7 +299,7 @@ def look(board_food, board_snakes, you_id, board_matrix, turn):
         # print(board_matrix)
 
         #*HEROKU_REMOVE*
-        print(np.matrix(board_matrix))
+        # print(np.matrix(board_matrix))
 
         print("-------------------")
 
