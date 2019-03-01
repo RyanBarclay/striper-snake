@@ -7,7 +7,7 @@ import numpy as np
 
 debug = True
 
-def think(data, inLoop, foodTrapped):
+def think(data, inLoop, foodTrapped, spawn_xy):
     """
     Function: think(data)
 
@@ -64,6 +64,10 @@ def think(data, inLoop, foodTrapped):
 
         foodTrapped:
             Boolian value that will be true when snake trapping food
+
+        spawn_xy:
+            this is a list containing two elements: x,y. These coords are the location of your head when you started game in the board matrix
+
     Output:
         direction:
             This will be  a string of 'up', 'down', 'left', or 'right'
@@ -73,6 +77,9 @@ def think(data, inLoop, foodTrapped):
 
         foodTrapped:
             Boolian value will be set to true when snake trapped food
+
+        spawn_xy:
+            this is a list containing two elements: x,y. These coords are the location of your head when you started game in the board matrix
     """
     #Process data
     game = data['game']
@@ -98,7 +105,8 @@ def think(data, inLoop, foodTrapped):
 
     if debug:
         print("\nname: %s" % (you_name))
-        print("\nturn: %s" % (turn))
+        print("snake_id: %s" % (you_id))
+        print("turn: %s" % (turn))
         print("-------------------")
 
     board_matrix = [[0 for x in range(board_width)] for y in range(board_height)]
@@ -107,12 +115,17 @@ def think(data, inLoop, foodTrapped):
     look(board_food, board_snakes, you_id, board_matrix, turn)
     head_xy = head_finder(board_matrix)
     #Initialize board representation and find my head
+    if turn is 0:
+        spawn_xy = head_xy
 
     food_location, closest = food_finder(board_food, you_id, board_snakes)
     #Look for closest food and look if your the closest
 
-    safe_moves = move_check(head_xy, board_matrix, turn)
+    safe_choices = move_check(head_xy, board_matrix, turn)
     #Finds acceptiable moves
+
+    """EDIT MAIN VALUES"""
+    hungerThreshold = 40
 
     choice = 'up'
     #initializes the outputs
@@ -139,7 +152,9 @@ def think(data, inLoop, foodTrapped):
         else:
             #If in loop and has already eaten food or is young
             #Snake should stay in the loop untill it can get food and it knows it can
-            pass
+
+            #Logic
+
             #checkIfNeedToEat, this needs to check if no food (if so no is ans)
                 #yes
                 #goEatFood funtion,  inloop = false
@@ -149,6 +164,25 @@ def think(data, inLoop, foodTrapped):
                     #go_to_food, inloop = false
                     #no
                     #Stayinloop function
+
+            if you_health < hungerThreshold:
+                choice = eat_food(head_xy, food_location, safe_choices)
+                inLoop = False
+
+                """REMOVE"""
+                return choice, inLoop, foodTrapped, spawn_xy
+                """END-OF-REMOVE"""
+            else:
+                if closest is True:
+                    moves, box_ready = go_to_food(safe_choices, food_location, head_xy, board_matrix)
+                    choice = moves[0]
+                    inLoop = False
+                    """REMOVE"""
+                    return choice, inLoop, foodTrapped, spawn_xy
+                    """END-OF-REMOVE"""
+                else:
+                    choice = stayInLoop()
+                    pass
     else:
         #If not in loop/holding patern do this
         if young is True:
@@ -159,12 +193,14 @@ def think(data, inLoop, foodTrapped):
             pass
             if(turn <= 2):
                 #is it in the first 3 moves
-                choice = makeFirstLoop(inLoop, board_matrix, safe_moves, turn, head_xy)
+                choice = makeFirstLoop(inLoop, safe_choices, turn, spawn_xy, board_matrix)
                 """REMOVE"""
-                return choice, inLoop, foodTrapped
-                pass
+                print("spawn_xy: %s" % (spawn_xy))
+                return choice, inLoop, foodTrapped, spawn_xy
+                """END-OF-REMOVE"""
+                #DONE
             else:
-                if(you_health > 90):
+                if(you_health < (hungerThreshold + 30)):
                     #go into loop
                     pass
                 else:
@@ -175,7 +211,7 @@ def think(data, inLoop, foodTrapped):
 
         else:
             #Go and get food because it has already decided
-            moves, box_ready = go_to_food(safe_moves, food_location, head_xy)
+            moves, box_ready = go_to_food(safe_choices, food_location, head_xy)
             if box_ready is True:
                 #ignore move and start making a loop
                     #if this makes a loop makes inLoop true
@@ -183,6 +219,9 @@ def think(data, inLoop, foodTrapped):
             else:
                 #go to food
                 choice = moves[0]
+                """REMOVE"""
+                return choice, inLoop, foodTrapped, spawn_xy
+                """END-OF-REMOVE"""
                 pass
     #end of logic tree
 
@@ -196,9 +235,9 @@ def think(data, inLoop, foodTrapped):
     TODO: remove the code below that is in this if/else, go_to_food call fragment
     """
 
-    moves, box = go_to_food(safe_moves, food_location, head_xy)
+    moves, box = go_to_food(safe_choices, food_location, head_xy)
     if box:
-        choice = eat_food(head_xy,food_location, safe_moves)
+        choice = eat_food(head_xy, food_location, safe_choices)
         #print("Temp return")
         #print(choice)
     else:
@@ -210,9 +249,12 @@ def think(data, inLoop, foodTrapped):
         print("-------------------")
         print("think retuns returns:")
         print("choice: %s" % (choice) )
+        print("inLoop: %s" % (inLoop))
+        print("foodTrapped: %s" % (foodTrapped))
+        print("spawn_xy: %s" % (spawn_xy))
         print("-------------------")
 
-    return choice, inLoop, foodTrapped
+    return choice, inLoop, foodTrapped, spawn_xy
 
 def look(board_food, board_snakes, you_id, board_matrix, turn):
     """
@@ -358,7 +400,9 @@ def move_check(head_xy, board_matrix, turn):
         up_element = board_matrix[head_pos_y-1][head_pos_x]
         if up_element in danger_elements:
             up_clear = False
-
+        elif turn is 1:
+            if up_element is 'mt':
+                up_clear = False
     #if down is a bad move, remove it as an option
     if head_pos_y == bottom_edge:
         down_clear = False
@@ -366,6 +410,9 @@ def move_check(head_xy, board_matrix, turn):
         down_element = board_matrix[head_pos_y+1][head_pos_x]
         if down_element in danger_elements:
             down_clear = False
+        elif turn is 1:
+            if down_element is 'mt':
+                down_clear = False
 
     #if left is a bad move, remove it as an option
     if head_pos_x == left_edge:
@@ -374,6 +421,9 @@ def move_check(head_xy, board_matrix, turn):
         left_element = board_matrix[head_pos_y][head_pos_x-1]
         if left_element in danger_elements:
             left_clear = False
+        elif turn is 1:
+            if left_element is 'mt':
+                left_clear = False
 
     #if right is a bad move, remove it as an option
     if head_pos_x == right_edge:
@@ -382,6 +432,9 @@ def move_check(head_xy, board_matrix, turn):
         right_element = board_matrix[head_pos_y][head_pos_x+1]
         if right_element in danger_elements:
             right_clear = False
+        elif turn is 1:
+            if right_element is 'mt':
+                right_clear = False
 
     #now to update the list of safe moves
     if up_clear:
@@ -396,10 +449,10 @@ def move_check(head_xy, board_matrix, turn):
     if right_clear:
         safe_choices.append('right')
 
+    #debug print out
     if debug is True:
         print("\nmove_check DEBUG:")
         print("-------------------")
-        #debug print out
         print("move_check returns:")
         print("safe_choices: %s" % (safe_choices) )
         print("-------------------")
@@ -825,7 +878,7 @@ def go_to_food(safe_choices, food_location, head_xy):
                 print("-------------------")
             return move,ready_to_box
 
-def makeFirstLoop(inLoop, board_matrix, safe_moves, turn, head_xy):
+def makeFirstLoop(inLoop, safe_choices, turn, spawn_xy, board_matrix):
     """
     Function:
         makeFirstLoop()
@@ -834,6 +887,23 @@ def makeFirstLoop(inLoop, board_matrix, safe_moves, turn, head_xy):
 
         There is only a problem when the board is 7x7 so this will be a basecase. The good news is that any bigger we can just do a basic loop
     Input:
+        inLoop:
+            Boolian value will be set to true when snake in a loop
+
+        safe_choices:
+            This is an list of moves that won't imediatlty kill the board_snakes
+                ***IF THIS IS EMPTY****
+                snake is dead because there are no safe moves
+
+        turn:
+            this is an int that represents the turn in the game
+
+        spawn_xy:
+            this is a list containing two elements: x,y. These coords are the location of your head when you started game in the board matrix
+
+        board_matrix:
+            this is an list of lists that represents the current board of Battle snake
+
     Output:
         choice:
             a string that is either 'up', 'down', 'right', 'left'
@@ -855,19 +925,82 @@ def makeFirstLoop(inLoop, board_matrix, safe_moves, turn, head_xy):
         #if 7x7 case
 
         #get my head
-        my_head_x = head_xy[0]
-        my_head_y = head_xy[1]
+        my_spawn_x = spawn_xy[0]
+        my_spawn_y = spawn_xy[1]
+
+        #if in a corner starting pos will go control inLoop, if not it will just try and make a loop ... fingers crossed
+        if my_spawn_x is 1:
+            if my_spawn_y is 1:
+                if turn == 0:
+                    choice = 'up'
+                elif turn == 1:
+                    choice = 'left'
+                else:
+                    choice = 'down'
+            elif my_spawn_y is 5:
+                if turn == 0:
+                    choice = 'left'
+                elif turn == 1:
+                    choice = 'down'
+                else:
+                    choice = 'right'
+            else:
+                if turn == 0:
+                    choice = 'left'
+                elif turn == 1:
+                    choice = 'down'
+                else:
+                    choice = 'right'
+        elif my_spawn_x is 5:
+            if my_spawn_y is 1:
+                if turn == 0:
+                    choice = 'up'
+                elif turn == 1:
+                    choice = 'right'
+                else:
+                    choice = 'down'
+            elif my_spawn_y is 5:
+                if turn == 0:
+                    choice = 'right'
+                elif turn == 1:
+                    choice = 'down'
+                else:
+                    choice = 'left'
+            else:
+                if turn == 0:
+                    choice = 'right'
+                elif turn == 1:
+                    choice = 'up'
+                else:
+                    choice = 'left'
+        else:
+        #x = 3
+            if my_spawn_y is 1:
+                if turn == 0:
+                    choice = 'up'
+                elif turn == 1:
+                    choice = 'left'
+                else:
+                    choice = 'down'
+            else:
+                if turn == 0:
+                    choice = 'down'
+                elif turn == 1:
+                    choice = 'left'
+                else:
+                    choice = 'up'
 
     #check for danger
-    if choice in safe_moves:
+    if choice in safe_choices:
         choice = choice
+        if turn == 2:
+            inLoop = True
     else:
-        choice = safe_moves[0]
+        choice = safe_choices[0]
+        print("NOT IN SAFE")
+        if turn == 3:
+            inLoop = False
     #decided if in loop
-    if turn == 3:
-        inLoop = True
-    else:
-        inLoop = False
 
     #debug print out
     if debug is True:
@@ -877,11 +1010,29 @@ def makeFirstLoop(inLoop, board_matrix, safe_moves, turn, head_xy):
         print("makeFirstLoop returns:")
         print("choice: %s" % (choice) )
         print("-------------------")
-    return  choice
+    return choice
 
-def eat_food(head_xy, food_location, safe_moves):
+def eat_food(head_xy, food_location, safe_choices):
     """
-    REMOVE IN FINAL VERSION
+    Function:
+        eat_food()
+    Description:
+        This will go and eat the food asap
+    Input:
+        head_xy:
+            This is a list containing two elements: x,y. These coords are the location of your head in the board matrix.
+
+        food_location:
+            a list comprised of { {[x: #][y: #]}} that is the location food it wants to get
+
+        safe_choices:
+            This is an list of moves that won't imediatlty kill the board_snakes
+                ***IF THIS IS EMPTY****
+                snake is dead because there are no safe moves
+    Output:
+        move:
+            this is a list containing two elements: x,y. These coords are the location of your head in the board matrix
+
     """
     head_pos_x = head_xy[0]
     head_pos_y = head_xy[1]
@@ -900,8 +1051,22 @@ def eat_food(head_xy, food_location, safe_moves):
         #if left go right
         move = 'right'
 
-    if move in safe_moves:
+    if move in safe_choices:
         return move
     else:
-        move = safe_moves[0]
+        move = safe_choices[0]
+
+        if debug is True:
+            print("\neat_food DEBUG:")
+            print("-------------------")
+            #debug print out
+            print("eat_food returns:")
+            print("move: %s" % (move) )
+            print("-------------------")
+
         return move
+
+def stay_in_loop():
+    move = 'up'
+
+    return move

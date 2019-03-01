@@ -7,8 +7,10 @@ from api import ping_response, start_response, move_response, end_response
 from brain import think
 
 #globals:
+globalList = []
 inLoop =  False
 foodTrapped =  False
+spawn_xy = [0,0]
 
 @bottle.route('/')
 def index():
@@ -44,6 +46,11 @@ def start():
             initialize your snake state here using the
             request's data if necessary.
     """
+    global globalList
+    you = data['you']
+    you_id = you['id']
+    element = [you_id, spawn_xy, inLoop ,foodTrapped]
+    globalList.append(element)
 
     color = "#FFC9F7"
     head = "bendr"
@@ -57,11 +64,36 @@ def move():
     data = bottle.request.json
     # print(json.dumps(data))
     # directions = ['up', 'down', 'left', 'right']
+    global spawn_xy
     global inLoop
     global foodTrapped
+    global globalList
+
+    #need to get specific globals for this snake
+    you = data['you']
+    you_id = you['id']
+    globalList_index = len(globalList)-1
+    while globalList_index >= 0:
+        globalList_token = globalList[globalList_index]
+        if globalList_token[0] == you_id:
+            #[elements containing my glabals]
+            #undates specific globals for this snake
+            spawn_xy = globalList_token[1]
+            inLoop = globalList_token[2]
+            foodTrapped = globalList_token[3]
+            break
+        else:
+            globalList_index -= 1
     # print(inLoop)
     # print(foodTrapped)
-    direction, inLoop, foodTrapped = think(data, inLoop, foodTrapped)
+    direction, inLoop, foodTrapped, spawn_xy = think(data, inLoop, foodTrapped, spawn_xy)
+
+    #returns edited glabals to globalList
+    globalList_token[1] = spawn_xy
+    globalList_token[2] = inLoop
+    globalList_token[3] = foodTrapped
+    #updates list element in globalList
+    globalList[globalList_index] = globalList_token
     # print direction
     return move_response(direction)
 
@@ -74,6 +106,17 @@ def end():
     TODO: If your snake AI was stateful,
         clean up any stateful objects here.
     """
+    you = data['you']
+    you_id = you['id']
+    globalList_index = len(globalList)-1
+    while globalList_index >= 0:
+        globalList_token = globalList[globalList_index]
+        if globalList_token[0] == you_id:
+            del globalList[globalList_index]
+            break
+        else:
+            globalList_index =- 1
+
     # print(json.dumps(data))
 
     return end_response()
