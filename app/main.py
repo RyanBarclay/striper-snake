@@ -8,16 +8,18 @@ from brain import think
 
 #globals:
 globalList = []
-inLoop =  False
-foodTrapped =  False
+inLoop = False
+foodTrapped = False
 spawn_xy = [0,0]
+move_history = []
+tail_loop_ready = False
 
 @bottle.route('/')
 def index():
     return '''
     Battlesnake documentation can be found at
        <a href="https://docs.battlesnake.io">https://docs.battlesnake.io</a>.
-    '''
+    # '''
 
 @bottle.route('/static/<path:path>')
 def static(path):
@@ -47,14 +49,22 @@ def start():
             request's data if necessary.
     """
     global globalList
+
+    inLoop = False
+    foodTrapped = False
+    spawn_xy = [0,0]
+    move_history= []
+    tail_loop_ready = False
+
     you = data['you']
     you_id = you['id']
-    element = [you_id, spawn_xy, inLoop ,foodTrapped]
+    element = [you_id, spawn_xy, inLoop ,foodTrapped, move_history, tail_loop_ready]
     globalList.append(element)
 
     color = "#FFC9F7"
     head = "bendr"
     tail = "fat-rattle"
+    print(globalList)
 
     return start_response(color, head, tail)
 
@@ -68,6 +78,8 @@ def move():
     global inLoop
     global foodTrapped
     global globalList
+    global move_history
+    global tail_loop_ready
 
     #need to get specific globals for this snake
     you = data['you']
@@ -81,20 +93,25 @@ def move():
             spawn_xy = globalList_token[1]
             inLoop = globalList_token[2]
             foodTrapped = globalList_token[3]
+            move_history = globalList_token[4]
+            tail_loop_ready = globalList_token[5]
             break
         else:
             globalList_index -= 1
     # print(inLoop)
     # print(foodTrapped)
-    direction, inLoop, foodTrapped, spawn_xy = think(data, inLoop, foodTrapped, spawn_xy)
+    direction, inLoop, foodTrapped, spawn_xy, move_history, tail_loop_ready = think(data, inLoop, foodTrapped, spawn_xy, move_history, tail_loop_ready)
+
+    #puts most recent move in begining
 
     #returns edited glabals to globalList
     globalList_token[1] = spawn_xy
     globalList_token[2] = inLoop
     globalList_token[3] = foodTrapped
+    globalList_token[4] = move_history
+    globalList_token[5] = tail_loop_ready
     #updates list element in globalList
     globalList[globalList_index] = globalList_token
-    # print direction
     return move_response(direction)
 
 
