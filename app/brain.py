@@ -117,7 +117,7 @@ def think(data, inLoop, foodTrapped):
     choice = 'up'
     #initializes the outputs
 
-    adolescence = [3,4,5,6]
+    adolescence = [3,4]
     if you_length in adolescence:
         young = True
     else:
@@ -163,6 +163,28 @@ def think(data, inLoop, foodTrapped):
                 """REMOVE"""
                 return choice, inLoop, foodTrapped
                 pass
+            elif you_health > 30:
+                #go in loop
+                headx = head_xy[0]
+                heady = head_xy[1]
+                if board_matrix[heady-1][headx] is 'mb':
+                    choice = 'right'
+                if board_matrix[heady+1][headx] is 'mb':
+                    choice = 'left'
+                if board_matrix[heady][headx+1] is 'mb':
+                    choice = 'down'
+                if board_matrix[heady][headx-1] is 'mb':
+                    choice = 'up'
+
+
+
+
+                if choice in safe_moves:
+                    pass
+                else:
+                    choice = safe_moves[0]
+                """REMOVE"""
+                return choice, inLoop, foodTrapped
             else:
                 pass
 
