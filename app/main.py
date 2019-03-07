@@ -7,15 +7,19 @@ from api import ping_response, start_response, move_response, end_response
 from brain import think
 
 #globals:
-inLoop =  False
-foodTrapped =  False
+globalList = []
+inLoop = False
+foodTrapped = False
+spawn_xy = [0,0]
+move_history = []
+tail_loop_ready = False
 
 @bottle.route('/')
 def index():
     return '''
     Battlesnake documentation can be found at
        <a href="https://docs.battlesnake.io">https://docs.battlesnake.io</a>.
-    '''
+    # '''
 
 @bottle.route('/static/<path:path>')
 def static(path):
@@ -44,10 +48,23 @@ def start():
             initialize your snake state here using the
             request's data if necessary.
     """
+    global globalList
+
+    inLoop = False
+    foodTrapped = False
+    spawn_xy = [0,0]
+    move_history= []
+    tail_loop_ready = False
+
+    you = data['you']
+    you_id = you['id']
+    element = [you_id, spawn_xy, inLoop ,foodTrapped, move_history, tail_loop_ready]
+    globalList.append(element)
 
     color = "#FFC9F7"
     head = "bendr"
     tail = "fat-rattle"
+    print(globalList)
 
     return start_response(color, head, tail)
 
@@ -57,12 +74,44 @@ def move():
     data = bottle.request.json
     # print(json.dumps(data))
     # directions = ['up', 'down', 'left', 'right']
+    global spawn_xy
     global inLoop
     global foodTrapped
+    global globalList
+    global move_history
+    global tail_loop_ready
+
+    #need to get specific globals for this snake
+    you = data['you']
+    you_id = you['id']
+    globalList_index = len(globalList)-1
+    while globalList_index >= 0:
+        globalList_token = globalList[globalList_index]
+        if globalList_token[0] == you_id:
+            #[elements containing my glabals]
+            #undates specific globals for this snake
+            spawn_xy = globalList_token[1]
+            inLoop = globalList_token[2]
+            foodTrapped = globalList_token[3]
+            move_history = globalList_token[4]
+            tail_loop_ready = globalList_token[5]
+            break
+        else:
+            globalList_index -= 1
     # print(inLoop)
     # print(foodTrapped)
-    direction, inLoop, foodTrapped = think(data, inLoop, foodTrapped)
-    # print direction
+    direction, inLoop, foodTrapped, spawn_xy, move_history, tail_loop_ready = think(data, inLoop, foodTrapped, spawn_xy, move_history, tail_loop_ready)
+
+    #puts most recent move in begining
+
+    #returns edited glabals to globalList
+    globalList_token[1] = spawn_xy
+    globalList_token[2] = inLoop
+    globalList_token[3] = foodTrapped
+    globalList_token[4] = move_history
+    globalList_token[5] = tail_loop_ready
+    #updates list element in globalList
+    globalList[globalList_index] = globalList_token
     return move_response(direction)
 
 
@@ -74,6 +123,17 @@ def end():
     TODO: If your snake AI was stateful,
         clean up any stateful objects here.
     """
+    you = data['you']
+    you_id = you['id']
+    globalList_index = len(globalList)-1
+    while globalList_index >= 0:
+        globalList_token = globalList[globalList_index]
+        if globalList_token[0] == you_id:
+            del globalList[globalList_index]
+            break
+        else:
+            globalList_index =- 1
+
     # print(json.dumps(data))
 
     return end_response()
