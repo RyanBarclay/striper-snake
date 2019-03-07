@@ -3,9 +3,9 @@ import json
 #To make this work on heroku you must search for all instances of "*HEROKU_REMOVE*" and comment the line under them
 
 #*HEROKU_REMOVE*
-import numpy as np
+# import numpy as np
 
-debug = True
+debug = False
 
 def think(data, inLoop, foodTrapped, spawn_xy, move_history, tail_loop_ready):
     """
@@ -143,7 +143,7 @@ def think(data, inLoop, foodTrapped, spawn_xy, move_history, tail_loop_ready):
     choice = 'up'
     #initializes the outputs
 
-    adolescence = [3,4,5,6]
+    adolescence = [3,4]
     if you_length in adolescence:
         young = True
     else:
@@ -414,7 +414,7 @@ def look(board_food, board_snakes, you_id, board_matrix, turn):
         # print(board_matrix)
 
         #*HEROKU_REMOVE*
-        print(np.matrix(board_matrix))
+        # print(np.matrix(board_matrix))
 
         print("-------------------")
 
